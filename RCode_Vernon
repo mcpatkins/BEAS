@@ -1,4 +1,4 @@
-# Test for means (Function created by Jabed)
+# Test for means (Function created by Jabed Tomal)
 
 # H_0: \mu_1 = \mu_2
 # vs
@@ -71,7 +71,7 @@ TestVars <- function(x1, x2){
 # Reading data
 rm(list = ls())
 
-ratt <- read.csv("C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/RattTest_Julian_New_Edited_New.csv", header = T) # Read data from CSV format
+ratt <- read.csv("ENTER VERNON DATA", header = T) # Read data from CSV format
 
 ratt$RattleDistance[ratt$RattleDistance <= 0.01] <- 0
 
@@ -90,7 +90,7 @@ length(ratt$RattleDistance[ratt$RattleDistance != 0])
 # Histogram of rattle with distance more than zero
 
 hist(ratt$RattleDistance[ratt$RattleDistance > 0], xlab = "Rattle distance (meter)", main = "")
-#whereAmI = "C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/Documents/"
+#whereAmI = ""
 #dev.print(device = postscript, paste(whereAmI, "Hist_Non_Zero_Rattle.eps",sep=""),width=8,height=8, horizontal = FALSE)
 #dev.print(pdf, paste(whereAmI, "Hist_Non_Zero_Rattle.pdf",sep=""),width=8,height=8)
 
@@ -100,7 +100,7 @@ hist(ratt$RattleDistance[ratt$RattleDistance > 0], xlab = "Rattle distance (mete
 # Histogram of log of rattle with distance more than zero
 
 hist(log(ratt$RattleDistance[ratt$RattleDistance > 0]), xlab = "Log of rattle distance (log-meter)", main = "")
-#whereAmI = "C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/Documents/"
+#whereAmI = ""
 #dev.print(device = postscript, paste(whereAmI, "Hist_Non_Zero_Rattle_Log.eps",sep=""),width=8,height=8, horizontal = FALSE)
 #dev.print(pdf, paste(whereAmI, "Hist_Non_Zero_Rattle_Log.pdf",sep=""),width=8,height=8)
 
@@ -133,7 +133,7 @@ ratt$Site <- (ratt$Site * -1) + 3 # Site = 2: Park; Site = 1: Ranch
 attach(ratt) # Attach data to R console
 
 plot(BodyCondition, RattleDistance, xlab = "Body condition (%)", ylab = "Rattle distance (meter)")
-#whereAmI = "C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/Documents/"
+#whereAmI = ""
 #dev.print(device = postscript, paste(whereAmI, "BC_RD.eps",sep=""),width=8,height=8, horizontal = FALSE)
 #dev.print(pdf, paste(whereAmI, "BC_RD.pdf",sep=""),width=8,height=8)
 
@@ -144,7 +144,7 @@ plot(BodyCondition, RattleDistance, xlab = "Body condition (%)", ylab = "Rattle 
 # Histogram of rattle distance
 
 hist(RattleDistance, xlab = "Rattle distance (meter)", main = "") # Histogram of the response variable
-#whereAmI = "C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/Documents/"
+#whereAmI = ""
 #dev.print(device = postscript, paste(whereAmI, "Hist_Full.eps",sep=""),width=8,height=8, horizontal = FALSE)
 #dev.print(pdf, paste(whereAmI, "Hist_Full.pdf",sep=""),width=8,height=8)
 
@@ -154,7 +154,7 @@ hist(RattleDistance, xlab = "Rattle distance (meter)", main = "") # Histogram of
 # Boxplot against Site
 
 boxplot(RattleDistance ~ Site, xlab = "Sites", ylab = "Rattle distance (meter)", names = c("Ranch", "Park"))
-#whereAmI = "C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/Documents/"
+#whereAmI = ""
 #dev.print(device = postscript, paste(whereAmI, "Boxplot_Site.eps",sep=""),width=8,height=8, horizontal = FALSE)
 #dev.print(pdf, paste(whereAmI, "Boxplot_Site.pdf",sep=""),width=8,height=8)
 
@@ -254,7 +254,7 @@ plot(Julian.Date[Sex == 2], RattleDistance[Sex == 2], xlab = "Days from Jan 1", 
 
 # Reading data
 rm(list = ls())
-ratt <- read.csv("C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/RattTest_Julian_New_Edited_New.csv", header = T) # Read data from CSV format
+ratt <- read.csv("Vernon Data", header = T) # Read data from CSV format
 ratt$Site <- (ratt$Site * -1) + 3 # Site = 2: Park; Site = 1: Ranch
 attach(ratt) # Attach data to R console
 head(ratt)
@@ -282,7 +282,7 @@ summary(reg1)
 # Julian.Date    0.009930   0.009394   1.057    0.295    
 # BCU            0.262350   0.165926   1.581    0.119    
 # ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# Signif. codes:  0 Â‘***Â’ 0.001 Â‘**Â’ 0.01 Â‘*Â’ 0.05 Â‘.Â’ 0.1 Â‘ Â’ 1
 
 # Residual standard error: 2.055 on 61 degrees of freedom
 # Multiple R-squared:  0.3058,    Adjusted R-squared:  0.2375 
@@ -305,7 +305,7 @@ anova(reg1)
 # BCU           1  10.553  10.553  2.5000   0.1190    
 # Residuals    61 257.496   4.221                     
 # ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# Signif. codes:  0 Â‘***Â’ 0.001 Â‘**Â’ 0.01 Â‘*Â’ 0.05 Â‘.Â’ 0.1 Â‘ Â’ 1
 
 AIC(reg1)
 
@@ -355,7 +355,7 @@ summary(reg2)
 # Weather:BCU                 0.0411778  0.0597253   0.689   0.4940  
 # Julian.Date:BCU             0.0047353  0.0074318   0.637   0.5272  
 # ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# Signif. codes:  0 Â‘***Â’ 0.001 Â‘**Â’ 0.01 Â‘*Â’ 0.05 Â‘.Â’ 0.1 Â‘ Â’ 1
 
 # Residual standard error: 2.01 on 46 degrees of freedom
 # Multiple R-squared:  0.4989,    Adjusted R-squared:  0.2702 
@@ -392,7 +392,7 @@ anova(reg2)
 # Julian.Date:BCU           1   1.640   1.640  0.4060   0.52717    
 # Residuals                46 185.849   4.040                      
 # ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# Signif. codes:  0 Â‘***Â’ 0.001 Â‘**Â’ 0.01 Â‘*Â’ 0.05 Â‘.Â’ 0.1 Â‘ Â’ 1
 
 AIC(reg2)
 
@@ -438,7 +438,7 @@ summary(reg3)
 # (Intercept)     3.5500     0.3490  10.173 3.78e-15 ***
 # factor(Site)2  -2.3965     0.4935  -4.856 7.69e-06 ***
 # ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# Signif. codes:  0 Â‘***Â’ 0.001 Â‘**Â’ 0.01 Â‘*Â’ 0.05 Â‘.Â’ 0.1 Â‘ Â’ 1
 
 # Residual standard error: 2.035 on 66 degrees of freedom
 # Multiple R-squared:  0.2632,    Adjusted R-squared:  0.2521 
@@ -455,7 +455,7 @@ anova(reg3)
 # factor(Site)  1  97.632  97.632   23.58 7.691e-06 ***
 # Residuals    66 273.273   4.140                      
 # ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# Signif. codes:  0 Â‘***Â’ 0.001 Â‘**Â’ 0.01 Â‘*Â’ 0.05 Â‘.Â’ 0.1 Â‘ Â’ 1
 
 AIC(reg3)
 
@@ -481,7 +481,7 @@ anova(reg1, reg3)
 
 # Reading data
 rm(list = ls())
-ratt <- read.csv("C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/RattTest_Julian_New_Edited_New.csv", header = T) # Read data from CSV format
+ratt <- read.csv("Vernon Data", header = T) # Read data from CSV format
 ratt$RattleDistance[ratt$RattleDistance <= 0.01] <- 0
 ratt$Site <- (ratt$Site * -1) + 3 # Site = 2: Park; Site = 1: Ranch
 attach(ratt) # Attach data to R console
@@ -663,7 +663,7 @@ mle2.rattle(2, -1, 0.7, Site, RattleDistance)
 
 # Reading data
 rm(list = ls())
-ratt <- read.csv("C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/RattTest_Julian_New_Edited_New.csv", header = T) # Read data from CSV format
+ratt <- read.csv("Vernon Data", header = T) # Read data from CSV format
 ratt$RattleDistance[ratt$RattleDistance <= 0.01] <- 0
 ratt$Site <- (ratt$Site * -1) + 3 # Site = 2: Park; Site = 1: Ranch
 attach(ratt) # Attach data to R console
@@ -935,7 +935,7 @@ mle2.rattle.full(-1.19, -1.19, 0.012, 0.105, 0.028, 0.013, 0.135, 0.83, Site, Bo
 
 # Reading data
 rm(list = ls())
-ratt <- read.csv("C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/RattTest_Julian_New_Edited_New.csv", header = T) # Read data from CSV format
+ratt <- read.csv("Vernon Data", header = T) # Read data from CSV format
 ratt$RattleDistance[ratt$RattleDistance <= 0.01] <- 0
 ratt$Site <- (ratt$Site * -1) + 3 # Site = 2: Park; Site = 1: Ranch
 attach(ratt) # Attach data to R console
@@ -1052,8 +1052,8 @@ xtable(res, digits = 3)
 ## 2. Interpretation of the coefficient of Body Temp:
 ##
 ## Therefore, the odds of no-rattle is decreased by 
-## 100 * (1-exp((-0.156859425 * 5))) = 54.36%  for every 5 °C increase 
-## in body temperature (recorded in range18.2 – 38.5 °C), 
+## 100 * (1-exp((-0.156859425 * 5))) = 54.36%  for every 5 Â°C increase 
+## in body temperature (recorded in range18.2 Â– 38.5 Â°C), 
 ## for fixed values of the other covariates.
 
 # Part 2 model for the non-zero y's 
