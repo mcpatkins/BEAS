@@ -1,0 +1,1174 @@
+# Test for means (Function created by Jabed)
+
+# H_0: \mu_1 = \mu_2
+# vs
+# H_A: \mu_1 > \mu_2
+
+TestMeans <- function(x1, x2){
+  # x1: vector of sample values from Population 1
+  # x2: vector of sample values from Population 2
+
+  n1 <- length(x1) # number of sample values in x1
+  n2 <- length(x2) # number of sample values in x2
+
+  x1b <- mean(x1) # mean of x1
+  s1 <- sd(x1) # SD of x1
+  x2b <- mean(x2) # mean of x2
+  s2 <- sd(x2) # SD of x2
+
+  # Pooled sample standard deviation
+  sp <- sqrt(((n1-1)*s1^2 + (n2 - 1)* s2^2)/(n1 + n2 - 2))
+
+  # Test statistics
+  tcal <- (x1b - x2b)/(sp*(sqrt((1/n1) + (1/n2))))
+
+  # degrees of freedom
+  dfs <- ((s1^2/n1)+(s2^2/n2))^2/(((s1^2/n1)^2/(n1-1)) + ((s2^2/n2)^2/(n2-1)))
+
+  # P-value
+  pval <- 1 - pt(tcal, df = dfs)
+
+  # Results
+  res <- list(TestStatistic = tcal, DegreesFreedom = dfs, Pvalue = pval)
+  
+  # Return values
+  return(res)
+}
+
+
+# Test for variances (Function created by Jabed)
+
+# H_0: \sigma^2_1 = \sigma^2_2
+# vs
+# H_A: \sigma^2_1 > \sigma^2_2
+
+TestVars <- function(x1, x2){
+  # x1: vector of sample values from Population 1
+  # x2: vector of sample values from Population 2
+
+  n1 <- length(x1) # number of sample values in x1
+  n2 <- length(x2) # number of sample values in x2
+
+  s1 <- sd(x1) # SD of x1
+  s2 <- sd(x2) # SD of x2
+
+
+  # Test statistics
+  Fcal <- s1^2/s2^2
+
+
+  # P-value
+  pval <- 1 - pf(Fcal, df1 = (n1 - 1), df2 = (n2 - 1))
+
+  # Results
+  res <- list(TestStatistic = Fcal, df1 = (n1 - 1), df2 = (n2 - 1), Pvalue = pval)
+  
+  # Return values
+  return(res)
+}
+
+
+# Reading data
+rm(list = ls())
+
+ratt <- read.csv("C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/RattTest_Julian_New_Edited_New.csv", header = T) # Read data from CSV format
+
+ratt$RattleDistance[ratt$RattleDistance <= 0.01] <- 0
+
+head(ratt) # Check the head of the data
+
+# The number of rattle at distance zero
+
+length(ratt$RattleDistance[ratt$RattleDistance == 0])
+# [1] 13
+
+# The number of rattle with distance greater than zero
+
+length(ratt$RattleDistance[ratt$RattleDistance != 0])
+# [1] 55
+
+# Histogram of rattle with distance more than zero
+
+hist(ratt$RattleDistance[ratt$RattleDistance > 0], xlab = "Rattle distance (meter)", main = "")
+#whereAmI = "C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/Documents/"
+#dev.print(device = postscript, paste(whereAmI, "Hist_Non_Zero_Rattle.eps",sep=""),width=8,height=8, horizontal = FALSE)
+#dev.print(pdf, paste(whereAmI, "Hist_Non_Zero_Rattle.pdf",sep=""),width=8,height=8)
+
+
+# Comment: The distribution is not symmetric - rather positively skewed.
+
+# Histogram of log of rattle with distance more than zero
+
+hist(log(ratt$RattleDistance[ratt$RattleDistance > 0]), xlab = "Log of rattle distance (log-meter)", main = "")
+#whereAmI = "C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/Documents/"
+#dev.print(device = postscript, paste(whereAmI, "Hist_Non_Zero_Rattle_Log.eps",sep=""),width=8,height=8, horizontal = FALSE)
+#dev.print(pdf, paste(whereAmI, "Hist_Non_Zero_Rattle_Log.pdf",sep=""),width=8,height=8)
+
+
+# After taking log the distribution becomes reasonably symmetric
+
+ratt$RattleDistance
+ratt$Site
+
+# Park
+length(ratt$RattleDistance[ratt$RattleDistance == 0 & ratt$Site == 1])
+# [1] 11
+
+# Ranch
+length(ratt$RattleDistance[ratt$RattleDistance == 0 & ratt$Site == 2])
+# [1] 2
+
+# Park
+length(ratt$RattleDistance[ratt$RattleDistance != 0 & ratt$Site == 1])
+# [1] 23
+
+# Ranch
+length(ratt$RattleDistance[ratt$RattleDistance != 0 & ratt$Site == 2])
+# [1] 32
+
+# Changing the labels for site
+
+ratt$Site <- (ratt$Site * -1) + 3 # Site = 2: Park; Site = 1: Ranch
+
+attach(ratt) # Attach data to R console
+
+plot(BodyCondition, RattleDistance, xlab = "Body condition (%)", ylab = "Rattle distance (meter)")
+#whereAmI = "C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/Documents/"
+#dev.print(device = postscript, paste(whereAmI, "BC_RD.eps",sep=""),width=8,height=8, horizontal = FALSE)
+#dev.print(pdf, paste(whereAmI, "BC_RD.pdf",sep=""),width=8,height=8)
+
+
+
+# Site = 2: Park, Site = 1: Ranch
+
+# Histogram of rattle distance
+
+hist(RattleDistance, xlab = "Rattle distance (meter)", main = "") # Histogram of the response variable
+#whereAmI = "C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/Documents/"
+#dev.print(device = postscript, paste(whereAmI, "Hist_Full.eps",sep=""),width=8,height=8, horizontal = FALSE)
+#dev.print(pdf, paste(whereAmI, "Hist_Full.pdf",sep=""),width=8,height=8)
+
+# Positively skewed - not symmetric or normal
+# Moreover, the rattle distance is zero inflated
+
+# Boxplot against Site
+
+boxplot(RattleDistance ~ Site, xlab = "Sites", ylab = "Rattle distance (meter)", names = c("Ranch", "Park"))
+#whereAmI = "C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/Documents/"
+#dev.print(device = postscript, paste(whereAmI, "Boxplot_Site.eps",sep=""),width=8,height=8, horizontal = FALSE)
+#dev.print(pdf, paste(whereAmI, "Boxplot_Site.pdf",sep=""),width=8,height=8)
+
+# Comment: The median and scatter of rattle distances in the park is much
+# lower than the ranch.
+
+# Comparing Means
+TestMeans(RattleDistance[Site == 1], RattleDistance[Site == 2])
+
+# $TestStatistic
+# [1] 4.857865
+
+# $DegreesFreedom
+# [1] 57.59852
+
+# $Pvalue
+# [1] 4.742359e-06
+# Comment: The mean rattle distance is significantly higher in ranch than park
+
+# Comparing Variances
+TestVars(RattleDistance[Site == 1], RattleDistance[Site == 2])
+
+# $TestStatistic
+# [1] 2.235827
+
+# $Pvalue
+# [1] 0.01178699
+
+# Comment: The rattle distance variance is significantly higher in ranch than park
+
+
+# Boxplot against Sex
+
+boxplot(RattleDistance ~ Sex, xlab = "Sex of snakes", ylab = "Distance from snake when rattle occurs (m)", names = c("Male", "Female"))
+
+# Comment: The median and scatter of rattle distance among male and female snakes
+# are not different.
+
+# Comparing Means
+TestMeans(RattleDistance[Sex == 1], RattleDistance[Sex == 2])
+
+# $TestStatistic
+# [1] 0.5365858
+
+# $DegreesFreedom
+# [1] 42.77971
+
+# $Pvalue
+# [1] 0.2971667
+
+# Comment: The mean rattle distance among male and female snakes are not statistically significant
+
+# Comparing Variances
+TestVars(RattleDistance[Sex == 1], RattleDistance[Sex == 2])
+
+# $TestStatistic
+# [1] 1.461897
+
+# $Pvalue
+# [1] 0.1848006
+
+# Comment: The rattle distance variances among male and female snakes are not statistically significant
+
+# Boxplot againt Weather
+
+boxplot(RattleDistance ~ Weather, xlab = "Percent cloudiness", ylab = "Distance from snake when rattle occurs (m)", names = c("0%", "1-10%", "11-20%", "21-30%", "31-40%", "71-80%", "91-100%"))
+
+# Summary statistics of Rattle Distance against Percent Cloudiness
+
+sm <- NULL
+for(i in sort(unique(Weather))){
+  sm <- cbind(sm, c(i, length(RattleDistance[Weather == i]), summary(RattleDistance[Weather == i])))
+}
+rownames(sm) <- c("Percent Cloud", "Number of Rattle", "Minimum", "1st Quartile", "Median", "Mean", "3rd Quartile", "Max")
+print(sm)
+
+# Scatter plot of Rattle Distance against JulianDate by Site
+
+par(mfrow = c(2, 2))
+
+# Park
+plot(Julian.Date[Site == 2], RattleDistance[Site == 2], xlab = "Days from Jan 1", ylab = "Rattle Distance", main = "Park", xlim = range(Julian.Date), ylim = range(RattleDistance))
+
+# Ranch
+plot(Julian.Date[Site == 1], RattleDistance[Site == 1], xlab = "Days from Jan 1", ylab = "Rattle Distance", main = "Ranch", xlim = range(Julian.Date), ylim = range(RattleDistance))
+
+
+# Scatter plot of Rattle Distance against JulianDate by Sex
+
+
+# Male
+plot(Julian.Date[Sex == 1], RattleDistance[Sex == 1], xlab = "Days from Jan 1", ylab = "Rattle Distance", main = "Male", xlim = range(Julian.Date), ylim = range(RattleDistance))
+
+# Female
+plot(Julian.Date[Sex == 2], RattleDistance[Sex == 2], xlab = "Days from Jan 1", ylab = "Rattle Distance", main = "Female", xlim = range(Julian.Date), ylim = range(RattleDistance))
+
+
+# Reading data
+rm(list = ls())
+ratt <- read.csv("C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/RattTest_Julian_New_Edited_New.csv", header = T) # Read data from CSV format
+ratt$Site <- (ratt$Site * -1) + 3 # Site = 2: Park; Site = 1: Ranch
+attach(ratt) # Attach data to R console
+head(ratt)
+
+# Regression model (Main Effects only)
+
+reg1 <- lm(RattleDistance ~ factor(Site) + BodyTemp + factor(Sex) + Weather + Julian.Date + BCU, data = ratt)
+summary(reg1)
+
+# Call:
+# lm(formula = RattleDistance ~ factor(Site) + BodyTemp + factor(Sex) + 
+#     Weather + Julian.Date + BCU, data = ratt)
+
+# Residuals:
+#     Min      1Q  Median      3Q     Max 
+# -4.3841 -1.2821 -0.2292  1.0039  6.4907 
+
+# Coefficients:
+#                Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)   -0.515746   2.700831  -0.191    0.849    
+# factor(Site)2 -2.572027   0.536347  -4.795 1.08e-05 ***
+# BodyTemp       0.035946   0.059644   0.603    0.549    
+# factor(Sex)2   0.073125   0.619783   0.118    0.906    
+# Weather        0.019732   0.064597   0.305    0.761    
+# Julian.Date    0.009930   0.009394   1.057    0.295    
+# BCU            0.262350   0.165926   1.581    0.119    
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+# Residual standard error: 2.055 on 61 degrees of freedom
+# Multiple R-squared:  0.3058,    Adjusted R-squared:  0.2375 
+# F-statistic: 4.478 on 6 and 61 DF,  p-value: 0.0008095
+
+
+# Comment: Only Site is significant
+
+anova(reg1)
+
+# Analysis of Variance Table
+
+# Response: RattleDistance
+#              Df  Sum Sq Mean Sq F value   Pr(>F)    
+# factor(Site)  1  97.632  97.632 23.1288 1.03e-05 ***
+# BodyTemp      1   0.836   0.836  0.1981   0.6578    
+# factor(Sex)   1   1.728   1.728  0.4093   0.5247    
+# Weather       1   0.025   0.025  0.0059   0.9392    
+# Julian.Date   1   2.635   2.635  0.6243   0.4325    
+# BCU           1  10.553  10.553  2.5000   0.1190    
+# Residuals    61 257.496   4.221                     
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+AIC(reg1)
+
+# [1] 299.5174
+
+# Regression model (Main Effects + Pairwise Interactions)
+
+reg2 <- lm(RattleDistance ~ factor(Site) + BodyTemp + factor(Sex) + Weather + Julian.Date + BCU + factor(Site) * BodyTemp + factor(Site) * factor(Sex) + factor(Site) * Weather + factor(Site) * Julian.Date + factor(Site) * BCU + BodyTemp * factor(Sex) + BodyTemp * Weather + BodyTemp * Julian.Date + BodyTemp * BCU + factor(Sex) * Weather + factor(Sex) * Julian.Date + factor(Sex) * BCU + Weather * Julian.Date + Weather * BCU + Julian.Date * BCU, data = ratt)
+summary(reg2)
+
+# Call:
+# lm(formula = RattleDistance ~ factor(Site) + BodyTemp + factor(Sex) + 
+#     Weather + Julian.Date + BCU + factor(Site) * BodyTemp + factor(Site) * 
+#     factor(Sex) + factor(Site) * Weather + factor(Site) * Julian.Date + 
+#     factor(Site) * BCU + BodyTemp * factor(Sex) + BodyTemp * 
+#     Weather + BodyTemp * Julian.Date + BodyTemp * BCU + factor(Sex) * 
+#     Weather + factor(Sex) * Julian.Date + factor(Sex) * BCU + 
+#     Weather * Julian.Date + Weather * BCU + Julian.Date * BCU, 
+#     data = ratt)
+
+# Residuals:
+#     Min      1Q  Median      3Q     Max 
+# -4.7178 -1.0969 -0.0386  0.8342  5.3687 
+
+# Coefficients:
+#                              Estimate Std. Error t value Pr(>|t|)  
+# (Intercept)                -6.5596718 14.8976883  -0.440   0.6618  
+# factor(Site)2              -2.8849676  6.6040125  -0.437   0.6643  
+# BodyTemp                    0.3215021  0.4258292   0.755   0.4541  
+# factor(Sex)2                0.2685131  7.8291137   0.034   0.9728  
+# Weather                    -0.3329015  0.8089787  -0.412   0.6826  
+# Julian.Date                 0.0721204  0.0725893   0.994   0.3256  
+# BCU                        -1.5778166  2.3393073  -0.674   0.5034  
+# factor(Site)2:BodyTemp      0.1279924  0.1298099   0.986   0.3293  
+# factor(Site)2:factor(Sex)2 -0.4355415  1.7414423  -0.250   0.8036  
+# factor(Site)2:Weather      -0.3320230  0.1826017  -1.818   0.0755 .
+# factor(Site)2:Julian.Date   0.0125538  0.0206517   0.608   0.5463  
+# factor(Site)2:BCU          -0.9596420  0.4726783  -2.030   0.0481 *
+# BodyTemp:factor(Sex)2      -0.0063907  0.1701337  -0.038   0.9702  
+# BodyTemp:Weather            0.0206293  0.0215603   0.957   0.3437  
+# BodyTemp:Julian.Date       -0.0031295  0.0023101  -1.355   0.1821  
+# BodyTemp:BCU                0.0494368  0.0541296   0.913   0.3658  
+# factor(Sex)2:Weather       -0.0870403  0.1977865  -0.440   0.6619  
+# factor(Sex)2:Julian.Date    0.0043421  0.0300327   0.145   0.8857  
+# factor(Sex)2:BCU           -0.0672541  0.4457842  -0.151   0.8807  
+# Weather:Julian.Date        -0.0007979  0.0032528  -0.245   0.8073  
+# Weather:BCU                 0.0411778  0.0597253   0.689   0.4940  
+# Julian.Date:BCU             0.0047353  0.0074318   0.637   0.5272  
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+# Residual standard error: 2.01 on 46 degrees of freedom
+# Multiple R-squared:  0.4989,    Adjusted R-squared:  0.2702 
+# F-statistic: 2.181 on 21 and 46 DF,  p-value: 0.0138
+
+# Comment: The interaction effects Site * Body Condition & Site * Weather appear significant
+
+anova(reg2)
+
+# Analysis of Variance Table
+
+# Response: RattleDistance
+#                          Df  Sum Sq Mean Sq F value    Pr(>F)    
+# factor(Site)              1  97.632  97.632 24.1652 1.165e-05 ***
+# BodyTemp                  1   0.836   0.836  0.2070   0.65128    
+# factor(Sex)               1   1.728   1.728  0.4276   0.51641    
+# Weather                   1   0.025   0.025  0.0061   0.93799    
+# Julian.Date               1   2.635   2.635  0.6522   0.42347    
+# BCU                       1  10.553  10.553  2.6120   0.11290    
+# factor(Site):BodyTemp     1   8.344   8.344  2.0652   0.15746    
+# factor(Site):factor(Sex)  1   5.739   5.739  1.4205   0.23944    
+# factor(Site):Weather      1  14.312  14.312  3.5425   0.06615 .  
+# factor(Site):Julian.Date  1   4.011   4.011  0.9927   0.32430    
+# factor(Site):BCU          1  19.045  19.045  4.7139   0.03512 *  
+# BodyTemp:factor(Sex)      1   1.781   1.781  0.4409   0.51002    
+# BodyTemp:Weather          1   1.371   1.371  0.3393   0.56310    
+# BodyTemp:Julian.Date      1   5.703   5.703  1.4115   0.24091    
+# BodyTemp:BCU              1   1.904   1.904  0.4712   0.49590    
+# factor(Sex):Weather       1   4.768   4.768  1.1801   0.28299    
+# factor(Sex):Julian.Date   1   0.288   0.288  0.0714   0.79052    
+# factor(Sex):BCU           1   0.746   0.746  0.1847   0.66939    
+# Weather:Julian.Date       1   1.182   1.182  0.2927   0.59112    
+# Weather:BCU               1   0.813   0.813  0.2013   0.65577    
+# Julian.Date:BCU           1   1.640   1.640  0.4060   0.52717    
+# Residuals                46 185.849   4.040                      
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+AIC(reg2)
+
+# [1] 307.3446
+
+# Comment: The AIC went up
+
+# Testing extra sum of squares for the pairwise interaction terms
+
+anova(reg1, reg2)
+
+# Analysis of Variance Table
+
+# Model 1: RattleDistance ~ factor(Site) + BodyTemp + factor(Sex) + Weather + 
+#     Julian.Date + BCU
+# Model 2: RattleDistance ~ factor(Site) + BodyTemp + factor(Sex) + Weather + 
+#     Julian.Date + BCU + factor(Site) * BodyTemp + factor(Site) * 
+#     factor(Sex) + factor(Site) * Weather + factor(Site) * Julian.Date + 
+#     factor(Site) * BCU + BodyTemp * factor(Sex) + BodyTemp * 
+#     Weather + BodyTemp * Julian.Date + BodyTemp * BCU + factor(Sex) * 
+#     Weather + factor(Sex) * Julian.Date + factor(Sex) * BCU + 
+#     Weather * Julian.Date + Weather * BCU + Julian.Date * BCU
+#   Res.Df    RSS Df Sum of Sq      F Pr(>F)
+# 1     61 257.50                           
+# 2     46 185.85 15    71.647 1.1822 0.3186
+
+# Comment: All the pairwise correlations are statistically insignificant
+
+# Regression model (Only with Site)
+
+reg3 <- lm(RattleDistance ~ factor(Site), data = ratt)
+summary(reg3)
+
+# Call:
+# lm(formula = RattleDistance ~ factor(Site), data = ratt)
+
+# Residuals:
+#     Min      1Q  Median      3Q     Max 
+# -3.5500 -1.1460 -0.3918  0.9765  6.5500 
+
+# Coefficients:
+#               Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)     3.5500     0.3490  10.173 3.78e-15 ***
+# factor(Site)2  -2.3965     0.4935  -4.856 7.69e-06 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+# Residual standard error: 2.035 on 66 degrees of freedom
+# Multiple R-squared:  0.2632,    Adjusted R-squared:  0.2521 
+# F-statistic: 23.58 on 1 and 66 DF,  p-value: 7.691e-06
+
+# Comment: The variable Site is significant
+
+anova(reg3)
+
+# Analysis of Variance Table
+
+# Response: RattleDistance
+#              Df  Sum Sq Mean Sq F value    Pr(>F)    
+# factor(Site)  1  97.632  97.632   23.58 7.691e-06 ***
+# Residuals    66 273.273   4.140                      
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+AIC(reg3)
+
+# [1] 293.5612
+
+# Extra sum of squares for all the Main Effects but Site
+
+anova(reg1, reg3)
+
+# Analysis of Variance Table
+
+# Model 1: RattleDistance ~ factor(Site) + BodyTemp + factor(Sex) + Weather + 
+#     Julian.Date + BCU
+# Model 2: RattleDistance ~ factor(Site)
+#   Res.Df    RSS Df Sum of Sq      F Pr(>F)
+# 1     61 257.50                           
+# 2     66 273.27 -5   -15.777 0.7475 0.5911
+
+# Comment: The effects of all the main variables other than Site are insignificant
+
+
+########################################################
+
+# Reading data
+rm(list = ls())
+ratt <- read.csv("C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/RattTest_Julian_New_Edited_New.csv", header = T) # Read data from CSV format
+ratt$RattleDistance[ratt$RattleDistance <= 0.01] <- 0
+ratt$Site <- (ratt$Site * -1) + 3 # Site = 2: Park; Site = 1: Ranch
+attach(ratt) # Attach data to R console
+
+# Fitting two-part models
+
+# Part 1 model for the zero y's
+
+mle1.rattle <- function(b0, b1, x, y){
+  # b0: The initial value of intercept
+  # b1: The initial value of slope
+  # x: The predictor variable
+  # y: The response variable
+  b <- c(b0, b1)
+  n <- length(y) # Total number of data points
+  n0 <- length(y[y == 0])  # The number of zero y values
+  x0 <- sum(x[y == 0])    # The sum of the predictor variable for which the response is zero
+  r <- 0 # Number of iterations
+  repeat{
+    b0 <- b[1]
+    b1 <- b[2]
+    r <- r + 1
+    pr <- rep(0, n)
+    p1 <- p2 <- p3 <- p4 <- p5 <- 0
+    for(i in 1:n){
+      pr[i] <- exp(b0 + b1 * x[i])/(1 + exp(b0 + b1 * x[i]))
+      p1 <- p1 + pr[i]
+      p2 <- p2 + x[i] * pr[i]
+      p3 <- p3 + pr[i] * (1 - pr[i])
+      p4 <- p4 + x[i] * pr[i] * (1 - pr[i])
+      p5 <- p5 + x[i]^2 * pr[i] * (1 - pr[i])
+    }
+    score <- c(n0 - p1, x0 - p2)
+    infor <- matrix(c(p3, p4, p4, p5), ncol = 2, byrow = T)
+    b.new <- b + solve(infor) %*% score
+    if(abs(b.new[1] - b[1]) <= 0.001 & abs(b.new[2] - b[2]) <= 0.001){
+      cat("Number of iterations \n")
+      print(r)
+      cat("Estimate of the parameter vector Beta\n")
+      print(b.new)
+      cat("Estimated variance-covariance matrix \n")
+      print(solve(infor))
+      cat("Estimate of the test statistics Z \n")
+      print(b.new/sqrt(diag(solve(infor))))
+      cat("Estimate of the p-values \n")
+      print(2 * (1 - pnorm(abs(b.new/sqrt(diag(solve(infor)))), mean = 0, sd = 1)))
+      cat("Probability of rattle at zero distance in the Ranch \n")
+      print(exp(b.new[1] + b.new[2] * 1)/(1 + exp(b.new[1] + b.new[2] * 1)))
+      cat("Probability of rattle at zero distance in the Park \n")
+      print(exp(b.new[1] + b.new[2] * 2)/(1 + exp(b.new[1] + b.new[2] * 2)))
+      cat("The odds of ZERO distance over non-zero distance rattle in the Park is", exp(b.new[2]), "times higher than that in the Ranch. \n")
+      cat("The AIC \n")
+      AIC <- -2 * sum(b.new[1] + b.new[2] * x[y == 0]) + 2 * sum(log(1 + exp(b.new[1] + b.new[2] * x))) + 2 * length(b.new)
+      print(AIC)
+      break
+    }
+    b <- b.new
+  }
+}
+
+
+mle1.rattle(0, 0, Site, RattleDistance)
+
+# Number of iterations 
+# [1] 6
+# Estimate of the parameter vector Beta
+#           [,1]
+# [1,] -4.807579
+# [2,]  2.034990
+# Estimated variance-covariance matrix 
+#           [,1]       [,2]
+# [1,]  2.259387 -1.1968872
+# [2,] -1.196887  0.6656373
+# Estimate of the test statistics Z 
+#           [,1]
+# [1,] -3.198387
+# [2,]  2.494270
+# Estimate of the p-values 
+#             [,1]
+# [1,] 0.001381985
+# [2,] 0.012621659
+# Probability of rattle at zero distance in the Ranch 
+# [1] 0.05882353
+# Probability of rattle at zero distance in the Park 
+# [1] 0.3235294
+# The odds of ZERO distance over non-zero distance rattle in the Park is 
+# 7.652174 times higher than that in the Ranch. 
+
+# The AIC (Part 1 Model)
+ 
+# [1] 62.01891
+
+# Part 2 model for the non-zero y's 
+
+mle2.rattle <- function(b0, b1, sig2, x, y){
+  # b0: The initial value of intercept
+  # b1: The initial value of slope
+  # sig2: The initial value of variance
+  # x: The predictor variable
+  # y: The response variable
+  theta <- c(b0, b1, sig2)
+  n <- length(y) # Total number of data points
+  r <- 0 # Number of iterations
+  repeat{
+    b0 <- theta[1]
+    b1 <- theta[2]
+    sig2 <- theta[3]
+    r <- r + 1
+    s1 <- sum(log(y) - b0 - b1 * x)/sig2
+    s2 <- sum((log(y) - b0 - b1 * x) * x)/sig2
+    s3 <- (-n + sum((log(y) - b0 - b1 * x)^2)/sig2)/(2*sig2)
+    score <- c(s1, s2, s3)
+    i11 <- n/sig2
+    i12 <- sum(x)/sig2
+    i13 <- sum(log(y) - b0 - b1 * x)/sig2^2
+    i22 <- sum(x^2)/sig2
+    i23 <- sum(x * (log(y) - b0 - b1 * x))/sig2^2
+    i33 <- -n/(2 * sig2^2) + sum((log(y) - b0 - b1 * x)^2)/sig2^3
+    infor <- matrix(c(i11, i12, i13, i12, i22, i23, i13, i23, i33), ncol = 3, byrow = T)
+    theta.new <- theta + solve(infor) %*% score
+    if(abs(theta.new[1] - theta[1]) <= 0.001 & abs(theta.new[2] - theta[2]) <= 0.001 & abs(theta.new[3] - theta[3]) <= 0.001){
+      cat("Number of iterations \n")
+      print(r)
+      cat("Estimate of the parameter vector Theta\n")
+      print(theta.new)
+      cat("Estimated variance-covariance matrix \n")
+      print(solve(infor))
+      cat("Estimate of the test statistics Z \n")
+      print(theta.new[c(1, 2)]/sqrt(diag(solve(infor)))[c(1, 2)])
+      cat("Estimate of the p-values \n")
+      print(2 * (1 - pnorm(abs(theta.new[c(1, 2)]/sqrt(diag(solve(infor)))[c(1, 2)]), mean = 0, sd = 1)))
+      cat("AIC \n")
+      AIC <- n * log(2 * pi) + n * log(theta.new[3]) + (1/theta.new[3]) * sum((log(y) - theta.new[1] - theta.new[2] * x)^2) + 2 * length(theta.new)
+      print(AIC)
+      break
+    }
+    theta <- theta.new
+  }
+}
+
+Site <- Site[RattleDistance > 0]
+RattleDistance <- RattleDistance[RattleDistance > 0]
+
+mle2.rattle(2, -1, 0.7, Site, RattleDistance)
+
+# Results
+
+# Number of iterations 
+# [1] 3
+# Estimate of the parameter vector Theta
+#            [,1]
+# [1,]  2.0241885
+# [2,] -0.9428170
+# [3,]  0.7195328
+# Estimated variance-covariance matrix 
+#               [,1]          [,2]          [,3]
+# [1,]  1.211560e-01 -7.621104e-02 -1.098104e-07
+# [2,] -7.621104e-02  5.373856e-02 -2.595981e-07
+# [3,] -1.098104e-07 -2.595981e-07  1.878323e-02
+# Estimate of the test statistics Z 
+# [1]  5.815385 -4.067096
+# Estimate of the p-values 
+# [1] 6.049457e-09 4.760267e-05
+# AIC (Part 2)
+# [1] 143.9799
+
+# Comment: When the distance of rattle is non-zero, the average of
+# log of rattle distance 0.94 lower in the park than in the ranch.
+
+
+# Combined AIC (Part 1 + Part 2)
+# 62.02 + 143.98 = 206.00
+
+# Comment: The AIC in the two-part model is much lower than the
+# classical regression model 
+
+
+########################################################
+
+# Reading data
+rm(list = ls())
+ratt <- read.csv("C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/RattTest_Julian_New_Edited_New.csv", header = T) # Read data from CSV format
+ratt$RattleDistance[ratt$RattleDistance <= 0.01] <- 0
+ratt$Site <- (ratt$Site * -1) + 3 # Site = 2: Park; Site = 1: Ranch
+attach(ratt) # Attach data to R console
+
+# Fitting two-part models (full - all 6 predictors)
+
+# Part 1 model for the zero y's
+
+mle1.rattle.full <- function(b0, b1, b2, b3, b4, b5, b6, x1, x2, x3, x4, x5, x6, y){
+  # b0: The initial value of intercept
+  # b1: The initial value of slope (Site)
+  # b2: The initial value of slope (BodyTemp)
+  # b3: The initial value of slope (Sex)
+  # b4: The initial value of slope (Weather)
+  # b5: The initial value of slope (Julian.Date)
+  # b6: The initial value of slope (BodyCondition)
+  # x1: The predictor variable (Site)
+  # x2: The predictor variable (BodyTemp)
+  # x3: The predictor variable (Sex)
+  # x4: The predictor variable (Weather)
+  # x5: The predictor variable (Julian.Date)
+  # x6: The predictor variable (BodyCondition)
+  # y: The response variable
+  b <- c(b0, b1, b2, b3, b4, b5, b6)
+  n <- length(y) # Total number of data points
+  n0 <- length(y[y == 0])  # The number of zero y values
+  x10 <- sum(x1[y == 0])    # The sum of the predictor variable (Site) for which the response is zero
+  x20 <- sum(x2[y == 0])    # The sum of the predictor variable (BodyTemp) for which the response is zero
+  x30 <- sum(x3[y == 0])    # The sum of the predictor variable (Sex) for which the response is zero
+  x40 <- sum(x4[y == 0])    # The sum of the predictor variable (Weather) for which the response is zero
+  x50 <- sum(x5[y == 0])    # The sum of the predictor variable (Julian.Date) for which the response is zero
+  x60 <- sum(x6[y == 0])    # The sum of the predictor variable (BodyCondition) for which the response is zero
+  r <- 0 # Number of iterations
+  repeat{
+    b0 <- b[1]
+    b1 <- b[2]
+    b2 <- b[3]
+    b3 <- b[4]
+    b4 <- b[5]
+    b5 <- b[6]
+    b6 <- b[7]
+    r <- r + 1
+    pr <- rep(0, n)
+    s0 <- s1 <- s2 <- s3 <- s4 <- s5 <- s6 <- 0
+    i00 <- i01 <- i02 <- i03 <- i04 <- i05 <- i06 <- 0
+    i11 <- i12 <- i13 <- i14 <- i15 <- i16 <- 0
+    i22 <- i23 <- i24 <- i25 <- i26 <- 0
+    i33 <- i34 <- i35 <- i36 <- 0
+    i44 <- i45 <- i46 <- 0
+    i55 <- i56 <- 0
+    i66 <- 0
+    for(i in 1:n){
+      pr[i] <- exp(b0 + b1 * x1[i] + b2 * x2[i] + b3 * x3[i] + b4 * x4[i] + b5 * x5[i] + b6 * x6[i])/(1 + exp(b0 + b1 * x1[i] + b2 * x2[i] + b3 * x3[i] + b4 * x4[i] + b5 * x5[i] + b6 * x6[i]))
+      s0 <- s0 + pr[i]
+      s1 <- s1 + x1[i] * pr[i]
+      s2 <- s2 + x2[i] * pr[i]
+      s3 <- s3 + x3[i] * pr[i]
+      s4 <- s4 + x4[i] * pr[i]
+      s5 <- s5 + x5[i] * pr[i]
+      s6 <- s6 + x6[i] * pr[i]
+      i00 <- i00 + pr[i] * (1 - pr[i])
+      i01 <- i01 + x1[i] * pr[i] * (1 - pr[i])
+      i02 <- i02 + x2[i] * pr[i] * (1 - pr[i])
+      i03 <- i03 + x3[i] * pr[i] * (1 - pr[i])
+      i04 <- i04 + x4[i] * pr[i] * (1 - pr[i])
+      i05 <- i05 + x5[i] * pr[i] * (1 - pr[i])
+      i06 <- i06 + x6[i] * pr[i] * (1 - pr[i])
+      i11 <- i11 + x1[i]^2 * pr[i] * (1 - pr[i])
+      i12 <- i12 + x1[i] * x2[i] * pr[i] * (1 - pr[i])
+      i13 <- i13 + x1[i] * x3[i] * pr[i] * (1 - pr[i])
+      i14 <- i14 + x1[i] * x4[i] * pr[i] * (1 - pr[i])
+      i15 <- i15 + x1[i] * x5[i] * pr[i] * (1 - pr[i])
+      i16 <- i16 + x1[i] * x6[i] * pr[i] * (1 - pr[i])
+      i22 <- i22 + x2[i]^2 * pr[i] * (1 - pr[i])
+      i23 <- i23 + x2[i] * x3[i] * pr[i] * (1 - pr[i])
+      i24 <- i24 + x2[i] * x4[i] * pr[i] * (1 - pr[i])
+      i25 <- i25 + x2[i] * x5[i] * pr[i] * (1 - pr[i])
+      i26 <- i26 + x2[i] * x6[i] * pr[i] * (1 - pr[i])
+      i33 <- i33 + x3[i]^2 * pr[i] * (1 - pr[i])
+      i34 <- i34 + x3[i] * x4[i] * pr[i] * (1 - pr[i])
+      i35 <- i35 + x3[i] * x5[i] * pr[i] * (1 - pr[i])
+      i36 <- i36 + x3[i] * x6[i] * pr[i] * (1 - pr[i])
+      i44 <- i44 + x4[i]^2 * pr[i] * (1 - pr[i])
+      i45 <- i45 + x4[i] * x5[i] * pr[i] * (1 - pr[i])
+      i46 <- i46 + x4[i] * x6[i] * pr[i] * (1 - pr[i])
+      i55 <- i55 + x5[i]^2 * pr[i] * (1 - pr[i])
+      i56 <- i56 + x5[i] * x6[i] * pr[i] * (1 - pr[i])
+      i66 <- i66 + x6[i]^2 * pr[i] * (1 - pr[i])
+    }
+    score <- c(n0 - s0, x10 - s1, x20 - s2, x30 - s3, x40 - s4, x50 - s5, x60 - s6)
+    infor <- matrix(c(i00, i01, i02, i03, i04, i05, i06,
+                      i01, i11, i12, i13, i14, i15, i16,
+                      i02, i12, i22, i23, i24, i25, i26,
+                      i03, i13, i23, i33, i34, i35, i36,
+                      i04, i14, i24, i34, i44, i45, i46,
+                      i05, i15, i25, i35, i45, i55, i56,
+                      i06, i16, i26, i36, i46, i56, i66),
+                      ncol = 7, byrow = T)
+    b.new <- b + solve(infor) %*% score
+    if(abs(b.new[1] - b[1]) <= 0.001 & abs(b.new[2] - b[2]) <= 0.001 & abs(b.new[3] - b[3]) <= 0.001 & abs(b.new[4] - b[4]) <= 0.001 & abs(b.new[5] - b[5]) <= 0.001 & abs(b.new[6] - b[6]) <= 0.001 & abs(b.new[7] - b[7]) <= 0.001){
+      cat("Number of iterations \n")
+      print(r)
+      result <- cbind(b.new, sqrt(diag(solve(infor))), b.new/sqrt(diag(solve(infor))), 2 * (1 - pnorm(abs(b.new/sqrt(diag(solve(infor)))), mean = 0, sd = 1)))
+      colnames(result) <- c("Coefficients", "Std Errors", "Test Statistics (Z)", "P-values")
+      rownames(result) <- c("Intercept", "Site", "Body Temp", "Sex", "Weather", "Julian Date", "Body Condition")
+      print(result)      
+      cat("\nThe AIC \n")
+      AIC <- -2 * sum(b.new[1] + b.new[2] * x1[y == 0] + b.new[3] * x2[y == 0] + b.new[4] * x3[y == 0] + b.new[5] * x4[y == 0] + b.new[6] * x5[y == 0] + b.new[7] * x6[y == 0]) + 2 * sum(log(1 + exp(b.new[1] + b.new[2] * x1 + b.new[3] * x2 + b.new[4] * x3 + b.new[5] * x4 + b.new[6] * x5 + b.new[7] * x6))) + 2 * length(b.new)
+      print(AIC)
+      break
+    }
+    b <- b.new
+  }
+}
+
+
+mle1.rattle.full(0, 0, 0, 0, 0, 0, 0, Site, BodyTemp, Sex, Weather, Julian.Date, BCU, RattleDistance)
+
+## Number of iterations 
+## [1] 6
+##                Coefficients Std Errors Test Statistics (Z)   P-values
+## Intercept       -3.50772856 3.87915714          -0.9042502 0.36586276
+## Site             2.24990053 0.90194060           2.4945108 0.01261309
+## Body Temp       -0.15783200 0.08842376          -1.7849503 0.07426939
+## Sex              0.51374242 0.86220934           0.5958442 0.55127933
+## Weather          0.03320643 0.08069698           0.4114953 0.68070936
+## Julian Date      0.00704341 0.01253794           0.5617678 0.57427423
+## Body Condition   0.10708584 0.22882774           0.4679758 0.63980192
+
+## The AIC 
+## [1] 67.4874
+
+# Comment: Only 2 variables Site and Body Temp are significant in Part 1 of the model.
+
+# Part 2 model for the non-zero y's 
+
+mle2.rattle.full <- function(b0, b1, b2, b3, b4, b5, b6, sig2, x1, x2, x3, x4, x5, x6, y){
+  # b0: The initial value of intercept
+  # b1: The initial value of slope (Site)
+  # b2: The initial value of slope (BodyTemp)
+  # b3: The initial value of slope (Sex)
+  # b4: The initial value of slope (Weather)
+  # b5: The initial value of slope (Julian.Date)
+  # b6: The initial value of slope (BodyCondition)
+  # sig2: The initial value of variance
+  # x1: The predictor variable (Site)
+  # x2: The predictor variable (BodyTemp)
+  # x3: The predictor variable (Sex)
+  # x4: The predictor variable (Weather)
+  # x5: The predictor variable (Julian.Date)
+  # x6: The predictor variable (BodyCondition)
+  # y: The response variable
+  theta <- c(b0, b1, b2, b3, b4, b5, b6, sig2)
+  n <- length(y) # Total number of data points
+  r <- 0 # Number of iterations
+  repeat{
+    b0 <- theta[1]
+    b1 <- theta[2]
+    b2 <- theta[3]
+    b3 <- theta[4]
+    b4 <- theta[5]
+    b5 <- theta[6]
+    b6 <- theta[7]
+    sig2 <- theta[8]
+    r <- r + 1
+    s0 <- sum(log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6)/sig2
+    s1 <- sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6) * x1)/sig2
+    s2 <- sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6) * x2)/sig2
+    s3 <- sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6) * x3)/sig2
+    s4 <- sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6) * x4)/sig2
+    s5 <- sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6) * x5)/sig2
+    s6 <- sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6) * x6)/sig2
+    s7 <- (-n + sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6)^2)/sig2)/(2*sig2)
+    score <- c(s0, s1, s2, s3, s4, s5, s6, s7)
+    i00 <- n/sig2
+    i01 <- sum(x1)/sig2
+    i02 <- sum(x2)/sig2
+    i03 <- sum(x3)/sig2
+    i04 <- sum(x4)/sig2
+    i05 <- sum(x5)/sig2
+    i06 <- sum(x6)/sig2
+    i07 <- sum(log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6)/sig2^2
+    i11 <- sum(x1^2)/sig2
+    i12 <- sum(x1 * x2)/sig2
+    i13 <- sum(x1 * x3)/sig2
+    i14 <- sum(x1 * x4)/sig2
+    i15 <- sum(x1 * x5)/sig2
+    i16 <- sum(x1 * x6)/sig2
+    i17 <- sum(x1 * (log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6))/sig2^2
+    i22 <- sum(x2^2)/sig2
+    i23 <- sum(x2 * x3)/sig2
+    i24 <- sum(x2 * x4)/sig2
+    i25 <- sum(x2 * x5)/sig2
+    i26 <- sum(x2 * x6)/sig2
+    i27 <- sum(x2 * (log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6))/sig2^2
+    i33 <- sum(x3^2)/sig2
+    i34 <- sum(x3 * x4)/sig2
+    i35 <- sum(x3 * x5)/sig2
+    i36 <- sum(x3 * x6)/sig2
+    i37 <- sum(x3 * (log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6))/sig2^2
+    i44 <- sum(x4^2)/sig2
+    i45 <- sum(x4 * x5)/sig2
+    i46 <- sum(x4 * x6)/sig2
+    i47 <- sum(x4 * (log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6))/sig2^2
+    i55 <- sum(x5^2)/sig2
+    i56 <- sum(x5 * x6)/sig2
+    i57 <- sum(x5 * (log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6))/sig2^2
+    i66 <- sum(x6^2)/sig2
+    i67 <- sum(x6 * (log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6))/sig2^2
+    i77 <- -n/(2 * sig2^2) + sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4 - b5 * x5 - b6 * x6)^2)/sig2^3
+    infor <- matrix(c(i00, i01, i02, i03, i04, i05, i06, i07,
+                      i01, i11, i12, i13, i14, i15, i16, i17,
+                      i02, i12, i22, i23, i24, i25, i26, i27,
+                      i03, i13, i23, i33, i34, i35, i36, i37,
+                      i04, i14, i24, i34, i44, i45, i46, i47,
+                      i05, i15, i25, i35, i45, i55, i56, i57,
+                      i06, i16, i26, i36, i46, i56, i66, i67,
+                      i07, i17, i27, i37, i47, i57, i67, i77),
+                      ncol = 8, byrow = T)
+    theta.new <- theta + solve(infor) %*% score
+    if(abs(theta.new[1] - theta[1]) <= 0.001 & abs(theta.new[2] - theta[2]) <= 0.001 & abs(theta.new[3] - theta[3]) <= 0.001 & abs(theta.new[4] - theta[4]) <= 0.001 & abs(theta.new[5] - theta[5]) <= 0.001 & abs(theta.new[6] - theta[6]) <= 0.001 & abs(theta.new[7] - theta[7]) <= 0.001 & abs(theta.new[8] - theta[8]) <= 0.001){
+      cat("Number of iterations \n")
+      print(r)
+      result <- cbind(theta.new[1:7], sqrt(diag(solve(infor)))[c(1:7)], theta.new[c(1:7)]/sqrt(diag(solve(infor)))[c(1:7)], 2 * (1 - pnorm(abs(theta.new[c(1:7)]/sqrt(diag(solve(infor)))[c(1:7)]), mean = 0, sd = 1)))
+      colnames(result) <- c("Coefficients", "Std Errors", "Test Statistics (Z)", "P-values")
+      rownames(result) <- c("Intercept", "Site", "Body Temp", "Sex", "Weather", "Julian Date", "Body Condition")
+      print(result)      
+      cat("\nAIC \n")
+      AIC <- n * log(2 * pi) + n * log(theta.new[8]) + (1/theta.new[8]) * sum((log(y) - theta.new[1] - theta.new[2] * x1 - theta.new[3] * x2 - theta.new[4] * x3 - theta.new[5] * x4 - theta.new[6] * x5 - theta.new[7] * x6)^2) + 2 * length(theta.new)
+      print(AIC)
+      break
+    }
+    theta <- theta.new
+  }
+}
+
+Site <- Site[RattleDistance > 0]
+BodyTemp <- BodyTemp[RattleDistance > 0]
+Sex <- Sex[RattleDistance > 0]
+Weather <- Weather[RattleDistance > 0]
+Julian.Date <- Julian.Date[RattleDistance > 0]
+BodyCondition <- BCU[RattleDistance > 0]
+RattleDistance <- RattleDistance[RattleDistance > 0]
+summary(lm(log(RattleDistance)~Site + BodyTemp + Sex + Weather + Julian.Date + BodyCondition))
+
+mle2.rattle.full(-1.19, -1.19, 0.012, 0.105, 0.028, 0.013, 0.135, 0.83, Site, BodyTemp, Sex, Weather, Julian.Date, BodyCondition, RattleDistance)
+
+## Number of iterations 
+## [1] 6
+##                Coefficients  Std Errors Test Statistics (Z)     P-values
+## Intercept       -1.19323804 1.228133799          -0.9715864 3.312564e-01
+## Site            -1.19000933 0.234682237          -5.0707261 3.963009e-07
+## Body Temp        0.01376608 0.024650157           0.5584581 5.765316e-01
+## Sex              0.10459958 0.257523339           0.4061752 6.846139e-01
+## Weather          0.02803287 0.027819035           1.0076866 3.136049e-01
+## Julian Date      0.01273803 0.004155577           3.0652849 2.174627e-03
+## Body Condition   0.13493541 0.074408354           1.8134443 6.976331e-02
+
+## AIC 
+## [1] 144.2485
+
+## Comment: Only 3 variables Site, Julian Date and Body Condition are significant in Part 2 of the model
+
+## Total AIC: 67.4874 + 144.2485 = 211.7359
+
+## Comment: Next we fit two-part model with four significant variables (Site, Body Temp, Julian Date and Body Condition)
+
+####################################################################################
+
+# Reading data
+rm(list = ls())
+ratt <- read.csv("C:/Users/jtomal/Desktop/Tablet_Files_Jan_03_2020/Marcus_Karl/RattTest_Julian_New_Edited_New.csv", header = T) # Read data from CSV format
+ratt$RattleDistance[ratt$RattleDistance <= 0.01] <- 0
+ratt$Site <- (ratt$Site * -1) + 3 # Site = 2: Park; Site = 1: Ranch
+attach(ratt) # Attach data to R console
+
+# Fitting two-part models (four significant predictors)
+
+# Part 1 model for the zero y's
+
+mle1.rattle.significant4 <- function(b0, b1, b2, b3, b4, x1, x2, x3, x4, y){
+  # b0: The initial value of intercept
+  # b1: The initial value of slope (Site)
+  # b2: The initial value of slope (BodyTemp)
+  # b3: The initial value of slope (Sex)
+  # b4: The initial value of slope (Weather)
+  # x1: The predictor variable (Site)
+  # x2: The predictor variable (BodyTemp)
+  # x3: The predictor variable (Sex)
+  # x4: The predictor variable (Weather)
+  # y: The response variable
+  b <- c(b0, b1, b2, b3, b4)
+  n <- length(y) # Total number of data points
+  n0 <- length(y[y == 0])  # The number of zero y values
+  x10 <- sum(x1[y == 0])    # The sum of the predictor variable (Site) for which the response is zero
+  x20 <- sum(x2[y == 0])    # The sum of the predictor variable (BodyTemp) for which the response is zero
+  x30 <- sum(x3[y == 0])    # The sum of the predictor variable (Sex) for which the response is zero
+  x40 <- sum(x4[y == 0])    # The sum of the predictor variable (Weather) for which the response is zero
+  r <- 0 # Number of iterations
+  repeat{
+    b0 <- b[1]
+    b1 <- b[2]
+    b2 <- b[3]
+    b3 <- b[4]
+    b4 <- b[5]
+    r <- r + 1
+    pr <- rep(0, n)
+    s0 <- s1 <- s2 <- s3 <- s4 <- 0
+    i00 <- i01 <- i02 <- i03 <- i04 <- 0
+    i11 <- i12 <- i13 <- i14 <- 0
+    i22 <- i23 <- i24 <- 0
+    i33 <- i34 <- 0
+    i44 <- 0
+    for(i in 1:n){
+      pr[i] <- exp(b0 + b1 * x1[i] + b2 * x2[i] + b3 * x3[i] + b4 * x4[i])/(1 + exp(b0 + b1 * x1[i] + b2 * x2[i] + b3 * x3[i] + b4 * x4[i]))
+      s0 <- s0 + pr[i]
+      s1 <- s1 + x1[i] * pr[i]
+      s2 <- s2 + x2[i] * pr[i]
+      s3 <- s3 + x3[i] * pr[i]
+      s4 <- s4 + x4[i] * pr[i]
+      i00 <- i00 + pr[i] * (1 - pr[i])
+      i01 <- i01 + x1[i] * pr[i] * (1 - pr[i])
+      i02 <- i02 + x2[i] * pr[i] * (1 - pr[i])
+      i03 <- i03 + x3[i] * pr[i] * (1 - pr[i])
+      i04 <- i04 + x4[i] * pr[i] * (1 - pr[i])
+      i11 <- i11 + x1[i]^2 * pr[i] * (1 - pr[i])
+      i12 <- i12 + x1[i] * x2[i] * pr[i] * (1 - pr[i])
+      i13 <- i13 + x1[i] * x3[i] * pr[i] * (1 - pr[i])
+      i14 <- i14 + x1[i] * x4[i] * pr[i] * (1 - pr[i])
+      i22 <- i22 + x2[i]^2 * pr[i] * (1 - pr[i])
+      i23 <- i23 + x2[i] * x3[i] * pr[i] * (1 - pr[i])
+      i24 <- i24 + x2[i] * x4[i] * pr[i] * (1 - pr[i])
+      i33 <- i33 + x3[i]^2 * pr[i] * (1 - pr[i])
+      i34 <- i34 + x3[i] * x4[i] * pr[i] * (1 - pr[i])
+      i44 <- i44 + x4[i]^2 * pr[i] * (1 - pr[i])
+    }
+    score <- c(n0 - s0, x10 - s1, x20 - s2, x30 - s3, x40 - s4)
+    infor <- matrix(c(i00, i01, i02, i03, i04,
+                      i01, i11, i12, i13, i14,
+                      i02, i12, i22, i23, i24,
+                      i03, i13, i23, i33, i34,
+                      i04, i14, i24, i34, i44),
+                      ncol = 5, byrow = T)
+    b.new <- b + solve(infor) %*% score
+    if(abs(b.new[1] - b[1]) <= 0.001 & abs(b.new[2] - b[2]) <= 0.001 & abs(b.new[3] - b[3]) <= 0.001 & abs(b.new[4] - b[4]) <= 0.001 & abs(b.new[5] - b[5]) <= 0.001){
+      cat("Number of iterations \n")
+      print(r)
+      result <- cbind(b.new, sqrt(diag(solve(infor))), b.new/sqrt(diag(solve(infor))), 2 * (1 - pnorm(abs(b.new/sqrt(diag(solve(infor)))), mean = 0, sd = 1)))
+      colnames(result) <- c("Coefficients", "Std Errors", "Test Statistics (Z)", "P-values")
+      rownames(result) <- c("Intercept", "Site", "Body Temp", "Julian Date", "Body Condition")
+      print(result)
+#      return(result)      
+      cat("\nThe AIC \n")
+      AIC <- -2 * sum(b.new[1] + b.new[2] * x1[y == 0] + b.new[3] * x2[y == 0] + b.new[4] * x3[y == 0] + b.new[5] * x4[y == 0]) + 2 * sum(log(1 + exp(b.new[1] + b.new[2] * x1 + b.new[3] * x2 + b.new[4] * x3 + b.new[5] * x4))) + 2 * length(b.new)
+      print(AIC)
+      break
+    }
+    b <- b.new
+  }
+}
+
+
+res <- mle1.rattle.significant4(0, 0, 0, 0, 0, Site, BodyTemp, Julian.Date, BCU, RattleDistance)
+#install.packages("xtable")
+library(xtable)
+xtable(res, digits = 3)
+
+## Number of iterations 
+## [1] 6
+##                Coefficients Std Errors Test Statistics (Z)   P-values
+## Intercept      -2.274795440 3.51396529          -0.6473585 0.51739992
+## Site            2.223222180 0.88009939           2.5261035 0.01153355
+## Body Temp      -0.156859425 0.08743825          -1.7939451 0.07282194
+## Julian Date     0.006403926 0.01231003           0.5202202 0.60291012
+## Body Condition  0.041168425 0.19797308           0.2079496 0.83526831
+
+## The AIC 
+## [1] 64.00661
+
+## 1. Interpretation of the coefficient of Site:
+##
+## For fixed body temperature, julian date and body condition, the odds of no-rattle is 
+## exp(2.223222180) = 9.237046 times higher in the Park than in the Ranch. 
+
+
+## 2. Interpretation of the coefficient of Body Temp:
+##
+## Therefore, the odds of no-rattle is decreased by 
+## 100 * (1-exp((-0.156859425 * 5))) = 54.36%  for every 5 °C increase 
+## in body temperature (recorded in range18.2 – 38.5 °C), 
+## for fixed values of the other covariates.
+
+# Part 2 model for the non-zero y's 
+
+mle2.rattle.significant4 <- function(b0, b1, b2, b3, b4, sig2, x1, x2, x3, x4, y){
+  # b0: The initial value of intercept
+  # b1: The initial value of slope (Site)
+  # b2: The initial value of slope (BodyTemp)
+  # b3: The initial value of slope (Sex)
+  # b4: The initial value of slope (Weather)
+  # sig2: The initial value of variance
+  # x1: The predictor variable (Site)
+  # x2: The predictor variable (BodyTemp)
+  # x3: The predictor variable (Sex)
+  # x4: The predictor variable (Weather)
+  # y: The response variable
+  theta <- c(b0, b1, b2, b3, b4, sig2)
+  n <- length(y) # Total number of data points
+  r <- 0 # Number of iterations
+  repeat{
+    b0 <- theta[1]
+    b1 <- theta[2]
+    b2 <- theta[3]
+    b3 <- theta[4]
+    b4 <- theta[5]
+    sig2 <- theta[6]
+    r <- r + 1
+    s0 <- sum(log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4)/sig2
+    s1 <- sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4) * x1)/sig2
+    s2 <- sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4) * x2)/sig2
+    s3 <- sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4) * x3)/sig2
+    s4 <- sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4) * x4)/sig2
+    s5 <- (-n + sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4)^2)/sig2)/(2*sig2)
+    score <- c(s0, s1, s2, s3, s4, s5)
+    i00 <- n/sig2
+    i01 <- sum(x1)/sig2
+    i02 <- sum(x2)/sig2
+    i03 <- sum(x3)/sig2
+    i04 <- sum(x4)/sig2
+    i05 <- sum(log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4)/sig2^2
+    i11 <- sum(x1^2)/sig2
+    i12 <- sum(x1 * x2)/sig2
+    i13 <- sum(x1 * x3)/sig2
+    i14 <- sum(x1 * x4)/sig2
+    i15 <- sum(x1 * (log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4))/sig2^2
+    i22 <- sum(x2^2)/sig2
+    i23 <- sum(x2 * x3)/sig2
+    i24 <- sum(x2 * x4)/sig2
+    i25 <- sum(x2 * (log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4))/sig2^2
+    i33 <- sum(x3^2)/sig2
+    i34 <- sum(x3 * x4)/sig2
+    i35 <- sum(x3 * (log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4))/sig2^2
+    i44 <- sum(x4^2)/sig2
+    i45 <- sum(x4 * (log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4))/sig2^2
+    i55 <- -n/(2 * sig2^2) + sum((log(y) - b0 - b1 * x1 - b2 * x2 - b3 * x3 - b4 * x4)^2)/sig2^3
+    infor <- matrix(c(i00, i01, i02, i03, i04, i05,
+                      i01, i11, i12, i13, i14, i15,
+                      i02, i12, i22, i23, i24, i25,
+                      i03, i13, i23, i33, i34, i35,
+                      i04, i14, i24, i34, i44, i45,
+                      i05, i15, i25, i35, i45, i55),
+                      ncol = 6, byrow = T)
+    theta.new <- theta + solve(infor) %*% score
+    if(abs(theta.new[1] - theta[1]) <= 0.001 & abs(theta.new[2] - theta[2]) <= 0.001 & abs(theta.new[3] - theta[3]) <= 0.001 & abs(theta.new[4] - theta[4]) <= 0.001 & abs(theta.new[5] - theta[5]) <= 0.001 & abs(theta.new[6] - theta[6]) <= 0.001){
+      cat("Number of iterations \n")
+      print(r)
+      result <- cbind(theta.new[1:5], sqrt(diag(solve(infor)))[c(1:5)], theta.new[c(1:5)]/sqrt(diag(solve(infor)))[c(1:5)], 2 * (1 - pnorm(abs(theta.new[c(1:5)]/sqrt(diag(solve(infor)))[c(1:5)]), mean = 0, sd = 1)))
+      colnames(result) <- c("Coefficients", "Std Errors", "Test Statistics (Z)", "P-values")
+      rownames(result) <- c("Intercept", "Site", "Body Temp", "Julian Date", "Body Condition")
+      print(result)      
+#      return(result)
+      cat("\nAIC \n")
+      AIC <- n * log(2 * pi) + n * log(theta.new[6]) + (1/theta.new[6]) * sum((log(y) - theta.new[1] - theta.new[2] * x1 - theta.new[3] * x2 - theta.new[4] * x3 - theta.new[5] * x4)^2) + 2 * length(theta.new)
+      print(AIC)
+      break
+    }
+    theta <- theta.new
+  }
+}
+
+Site <- Site[RattleDistance > 0]
+BodyTemp <- BodyTemp[RattleDistance > 0]
+Julian.Date <- Julian.Date[RattleDistance > 0]
+BodyCondition <- BCU[RattleDistance > 0]
+RattleDistance <- RattleDistance[RattleDistance > 0]
+## summary(lm(log(RattleDistance)~Site + BodyTemp + Julian.Date + BodyCondition))
+
+res <- mle2.rattle.significant4(-0.62, -1.18, 0.010, 0.01, 0.11, 0.8, Site, BodyTemp, Julian.Date, BodyCondition, RattleDistance)
+xtable(res, digits = 3)
+
+## Number of iterations 
+## [1] 8
+##                Coefficients  Std Errors Test Statistics (Z)     P-values
+## Intercept      -0.619380470 1.059883475          -0.5843854 5.589610e-01
+## Site           -1.177008975 0.235457165          -4.9988242 5.768096e-07
+## Body Temp       0.009286675 0.024413721           0.3803875 7.036578e-01
+## Julian Date     0.011894332 0.004120461           2.8866506 3.893664e-03
+## Body Condition  0.113117470 0.067281075           1.6812673 9.271101e-02
+
+## AIC 
+## [1] 141.3629
+
+## Total AIC: 64.00661 + 141.3629 = 205.3695
+
+## Interpretation of coefficients:
+
+## 1. Site:
+## The expected rattle distance is exp(1.177008975) = 3.244655 m shorter in the Park than in the Ranch.
+
+## 2. Julian Date
+## With the increase of Julian Date by 30 days (as it moves from the Winter to the Summer),
+## the expected rattle distance is increased by 1.428793 m.
+
+## 3. Body Condition [(WeightG/SVLCM): Larger numbers indicate that the snakes are healthy]
+## For one unit increase of body condition, the expected rattle distance is increased by
+## 1.119763 meter. [Healthy snakes are more likely to rattle from a long distance.]
+
+
